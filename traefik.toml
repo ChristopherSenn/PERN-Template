@@ -1,0 +1,30 @@
+[api]
+    dashboard = true
+    insecure = true
+
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":3000"
+
+[providers]
+    [providers.file]
+        directory = "/etc/traefik/"
+
+[http.routers]
+    [http.routers.frontend]
+        rule = "PathPrefix(`/`)"
+        service = "frontend"
+
+    [http.routers.backend]
+        rule = "PathPrefix(`/api/backend`)"
+        service = "backend"
+
+[http.services]
+    [http.services.frontend.loadBalancer]
+        [[http.services.frontend.loadBalancer.servers]]
+            url = "http://host.docker.internal:3001"
+
+    [http.services.backend.loadBalancer]
+        [[http.services.backend.loadBalancer.servers]]
+            url = "http://host.docker.internal:4500"

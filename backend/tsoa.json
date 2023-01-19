@@ -1,0 +1,29 @@
+{
+    "entryFile": "src/index.ts",
+    "noImplicitAdditionalProperties": "throw-on-extras",
+    "controllerPathGlobs": ["src/**/*controller.ts"],
+    "spec": {
+      "spec": {
+        "servers": [
+          {
+            "url": "/api/backend"
+          }
+        ]
+      },
+      "securityDefinitions": {
+        "jwt": {
+          "type": "apiKey",
+          "name": "authorization",
+          "in": "header"
+        }
+      },
+      "outputDirectory": "src",
+      "specVersion": 3
+    },
+    "routes": {
+      "basePath": "/api/backend",
+      "routesDir": "src",
+      "authenticationModule": "src/middleware/auth.ts"
+    }
+  }
+  

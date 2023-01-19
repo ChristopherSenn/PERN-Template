@@ -1,0 +1,86 @@
+version: "3.6"
+networks:
+  template-app:
+    driver: bridge
+
+services:
+
+  ingress:
+    image: traefik:v2.4
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+    volumes:
+      - ./traefik.toml:/etc/traefik/traefik.toml
+
+  frontend_prod:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - ingress
+    ports:
+      - "3001:3001"
+
+  backend_prod:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/backend/app/src
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      postgres_prod:
+        condition: service_healthy
+    ports:
+      - "4500:4500"
+
+  postgres_prod:
+    container_name: postgres_prod
+    image: postgres
+    ports:
+      - '5432:${DB_PORT}'
+    volumes:
+      - data:/data/postgres
+    environment:
+      - PGUSER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migration_prod:
+    build:
+      context: backend
+      dockerfile: Dockerfile.migration.dev
+    depends_on:
+      postgres_prod:
+        condition: service_healthy
+    environment:
+    - DATABASE_URL=${DATABASE_URL}
+
+  pgadmin_prod:
+    container_name: pgadmin_prod
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      postgres_prod:
+        condition: service_healthy
+    volumes:
+      - ./backend/pgadmin.config.json:/pgadmin4/servers.json
+    ports:
+      - "5050:80"
+
+volumes: 
+ data: {}

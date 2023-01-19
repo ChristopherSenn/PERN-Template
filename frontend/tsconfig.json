@@ -1,0 +1,59 @@
+{
+    "compilerOptions": {
+        "target": "ES2017",
+        "module": "ESNext",
+        "useDefineForClassFields": true,
+        "lib": [
+            "DOM",
+            "DOM.Iterable",
+            "ESNext"
+        ],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "Node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "baseUrl": "./",
+        "types": [
+            "node"
+        ],
+        "paths": {
+            "src/*":[
+                "src/*"
+            ],
+            "@src/*":[
+                "src/*"
+            ],
+            "components/*":[
+                "src/components/*"
+            ],
+            "@components/*":[
+                "src/components*"
+            ],
+            "x/*":[
+                "src/x/*"
+            ],
+            "@x/*":[
+                "src/x/*"
+            ],
+            "views/*":[
+                "src/views/*"
+            ],
+            "@views/*":[
+                "src/views/*"
+            ]
+        }
+    },
+    "include": [
+        "./src"
+    ],
+    "exclude": [
+        "./node_modules"
+    ]
+}

@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./src:/app/src
+    restart: always
+    ports:
+      - "4500:4500"
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    ports:
+      - '5432:${DB_PORT}'
+    volumes:
+      - data:/data/postgres
+    environment:
+      - PGUSER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - JWT_EXPIRETIME=${JWT_EXPIRETIME}
+      - JWT_SECRET=${JWT_EXPIRETIME}
+      - JWT_ISSUER=${JWT_EXPIRETIME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile.migration.dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+    - DATABASE_URL=${DATABASE_URL}
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./pgadmin.config.json:/pgadmin4/servers.json
+    ports:
+      - "5050:80"
+
+volumes: 
+ data: {}
